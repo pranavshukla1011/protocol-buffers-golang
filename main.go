@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"io/fs"
 	"io/ioutil"
@@ -50,6 +52,38 @@ func readFromFile(fname string, message proto.Message) error {
 		return err
 	}
 	return nil
+}
+
+func writeToJson(fname string, pb proto.Message) error {
+	jsonData, err := protojson.Marshal(pb)
+	if err != nil {
+		log.Fatal("Can't convert proto -> json", err)
+		return err
+	}
+	log.Println("jsonData :")
+	log.Println(jsonData)
+
+	err = ioutil.WriteFile(fname, jsonData, fs.ModePerm)
+	if err != nil {
+		log.Fatal("Can't write to json file", err)
+		return err
+	}
+	log.Fatal("Successfully written json data")
+	return nil
+}
+
+func GetJson(pb proto.Message) (*protobuffgo.Sample, error) {
+	binData, err := protojson.Marshal(pb)
+	if err != nil {
+		log.Fatal("Can't convert proto -> json", err)
+		return nil, err
+	}
+	jsonObj := &protobuffgo.Sample{}
+	err = json.Unmarshal(binData, jsonObj)
+	if err != nil {
+		log.Fatal("Error in unmarshalling json")
+	}
+	return jsonObj, nil
 }
 
 func sampleFunc() *protobuffgo.Sample {
