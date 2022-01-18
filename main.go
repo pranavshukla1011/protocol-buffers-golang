@@ -10,11 +10,15 @@ import (
 
 func main() {
 	message := sampleFunc()
-	writeToFile("sample.bin", message)
-
+	err := writeToFile("sample.bin", message)
+	if err != nil {
+		log.Fatal("Error in writeToFile")
+	}
 	sm := &protobuffgo.Sample{}
-	readFromFile("sample.bin", sm)
-
+	err = readFromFile("sample.bin", sm)
+	if err != nil {
+		log.Fatal("Error in readFromFile")
+	}
 	log.Println("sm : ", sm)
 }
 
@@ -24,13 +28,11 @@ func writeToFile(fname string, pb proto.Message) error {
 		log.Fatal("Can't serialize data", err)
 		return err
 	}
-
 	err = ioutil.WriteFile(fname, data, fs.ModePerm)
 	if err != nil {
 		log.Fatal("Can't write data to file", err)
 		return err
 	}
-
 	log.Println("Data has been written!")
 	return nil
 }
